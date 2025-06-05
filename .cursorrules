@@ -1,0 +1,55 @@
+## Project Awareness & Context
+- Check or update `TASK.md` before starting any task. Log new findings, edge cases, or product questions as `TODO:` items with today's date.
+- Ensure all features, copy, and behavior match the functional scope: compare deposit investment growth over time against 0% return baseline.
+
+## Code Structure & Modularity
+- Use **Streamlit** with **Python** and modularize calculations and charting logic.
+- Keep logic in dedicated functions or utility files once the app grows.
+- Keep each file under **500 lines** where possible; extract helpers like compound interest formulas.
+- Use folders like:
+
+## Design & Style
+- Use clean, accessible layouts with consistent formatting and spacing.
+- All UI must be:
+  - **Clear and friendly** (especially when explaining investment returns)
+  - **Visually comparable** (0% line vs. investment gains should be distinct)
+- Highlight 0% line in **red**; use tooltips or labels to explain gain calculations and assumptions.
+- Apply naming and comments that reflect Swiss context (`deposit_months`, `chf_amount`, etc.).
+- Follow PEP8, use Black formatter and flake8 for linting.
+
+## Features & Interactivity
+- Respect the core feature set:
+  - Inputs: rent per month, deposit duration, return rate (1%, 3%, 5%)
+  - Output table: shows values at 0%, selected return across time horizons (1, 5, 10, 15 years)
+  - Output chart: visual comparison of 0% vs selected return line
+- Ensure user input has:
+  - **Default values** (1800 CHF, 3 months, 3% return)
+  - **Validation** (e.g., no negative values)
+- Show table and chart **below** inputs; make chart responsive if viewport changes.
+- Add **clear explanations** near input and output if financial concept may be unclear to lay users.
+
+## Testing & Reliability
+- For any functions (e.g., future value calc), add:
+  - ✅ Standard case (e.g., 3% over 10 years)
+  - 🧨 Edge case (e.g., 0% return, 0 months deposit)
+  - ❌ Failure case (e.g., negative rent → should warn or block)
+- Place tests in a `/tests/` directory and use `pytest`.
+
+## Documentation & Collaboration
+- Document every calculation function and Streamlit component with Python docstrings.
+- Add inline comments explaining **why** certain formulas or logic is used (e.g., why we assume compound growth vs. linear).
+- Keep `README.md` updated with:
+  - Setup instructions
+  - Use case overview (Swiss deposit investing)
+  - List of features
+  - Example scenario
+- Track task status in `TASK.md`; add any open questions about UI/UX or regulatory expectations as `TODO:`s.
+
+## Internationalization & Localization
+- Prepare strings for potential localization (e.g., wrap user-facing text in a simple dictionary or use `gettext`/i18n placeholder structure).
+- Default currency is CHF; mark as `TODO:` if future multi-currency support is desired.
+
+## AI/Autopilot Behavior
+- Never assume or invent financial logic—verify with reliable sources or ask the product owner.
+- Never delete logic unless explicitly asked. Log any uncertainty about return rates, inflation, or charting conventions as `TODO:` with date.
+- Don't hardcode future features—design only what's in scope.
