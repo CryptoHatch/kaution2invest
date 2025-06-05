@@ -30,6 +30,50 @@ Kaution2Invest is a Streamlit application that helps Swiss renters visualize how
 
 - Streamlit 1.30.0 or higher (uses the `st.query_params` API)
 
+## Testing
+
+The application includes a comprehensive test suite covering calculations, i18n, UI components, and URL parameter handling.
+
+### Running Tests
+
+To run the tests:
+
+```
+pytest
+```
+
+For verbose output:
+
+```
+pytest -v
+```
+
+To run a specific test file:
+
+```
+pytest tests/test_calculations.py
+```
+
+### Test Report
+
+A test report utility is included to track test results over time:
+
+```
+python run_tests.py
+```
+
+This will run all tests and generate a JSON report. To compare with previous test runs:
+
+```
+python run_tests.py --compare
+```
+
+For more options:
+
+```
+python run_tests.py --help
+```
+
 ## Embedding in a Website
 
 The application can be embedded in a website using an iframe. It also supports language synchronization with the parent website.
