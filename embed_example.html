@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaution2Invest Embed Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .language-switcher button {
+            padding: 8px 12px;
+            margin-left: 10px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .language-switcher button.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .iframe-container {
+            width: 100%;
+            height: 800px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Website with Embedded Kaution2Invest Calculator</h1>
+            <div class="language-switcher">
+                <span>Website Language:</span>
+                <button id="de-btn" class="active" onclick="changeLanguage('de')">Deutsch</button>
+                <button id="en-btn" onclick="changeLanguage('en')">English</button>
+            </div>
+        </div>
+        
+        <div class="iframe-container">
+            <iframe id="streamlit-iframe" src="http://localhost:8501/?lang=de" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <script>
+        // Function to change the language of both the website and the embedded Streamlit app
+        function changeLanguage(lang) {
+            // Update iframe src with new language parameter
+            document.getElementById('streamlit-iframe').src = `http://localhost:8501/?lang=${lang}`;
+            
+            // Update active button styling
+            document.getElementById('de-btn').classList.remove('active');
+            document.getElementById('en-btn').classList.remove('active');
+            document.getElementById(`${lang}-btn`).classList.add('active');
+            
+            // Here you would also update your website's language if needed
+            // This is just a demonstration
+            console.log(`Website language changed to ${lang}`);
+        }
+    </script>
+</body>
+</html> 

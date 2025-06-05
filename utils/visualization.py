@@ -4,7 +4,9 @@ Visualization utilities for the Kaution2Invest application.
 
 import numpy as np
 import plotly.graph_objects as go
+import streamlit as st
 from utils.calculations import calculate_investment_growth
+from utils.i18n import get_text
 
 def create_growth_comparison_chart(deposit_amount, return_rate, years_range=None):
     """
@@ -18,6 +20,9 @@ def create_growth_comparison_chart(deposit_amount, return_rate, years_range=None
     Returns:
         plotly.graph_objects.Figure: Plotly figure object containing the chart
     """
+    # Get current language from session state
+    lang = st.session_state.language if 'language' in st.session_state else 'de'
+    
     if years_range is None:
         # Extend to 20 years to make compound effect more visible
         years_range = np.arange(0, 21)
@@ -25,6 +30,9 @@ def create_growth_comparison_chart(deposit_amount, return_rate, years_range=None
     # Calculate values for each year
     zero_growth_values = [deposit_amount] * len(years_range)
     investment_values = [calculate_investment_growth(deposit_amount, return_rate, year) for year in years_range]
+    
+    # Calculate difference values
+    difference_values = [inv - zero for inv, zero in zip(investment_values, zero_growth_values)]
     
     # Create a Plotly line chart
     fig = go.Figure()
@@ -35,7 +43,7 @@ def create_growth_comparison_chart(deposit_amount, return_rate, years_range=None
             x=years_range,
             y=zero_growth_values,
             mode='lines',
-            name='0% Return',
+            name=get_text('zero_return_name', lang),
             line=dict(color='red', width=2)
         )
     )
@@ -46,29 +54,62 @@ def create_growth_comparison_chart(deposit_amount, return_rate, years_range=None
             x=years_range,
             y=investment_values,
             mode='lines+markers',
-            name=f'{return_rate}% Return',
+            name=get_text('selected_return_name', lang, rate=return_rate),
             line=dict(color='blue', width=2),
             marker=dict(size=6, symbol='circle')
         )
     )
     
-    # Add annotation to explain compound interest
-    fig.add_annotation(
-        x=years_range[-5],  
-        y=investment_values[-5],
-        text="Compound interest<br>accelerates growth<br>over time",
-        showarrow=True,
-        arrowhead=1,
-        ax=-50,
-        ay=-40
+    # Add filled area between the lines to highlight the difference
+    fig.add_trace(
+        go.Scatter(
+            x=years_range,
+            y=investment_values,
+            mode='none',
+            name=get_text('potential_gain_name', lang),
+            fill='tonexty',
+            fillcolor='rgba(0, 0, 255, 0.1)',  # Light blue with transparency
+            showlegend=True
+        )
     )
+    
+    # Add average rental duration in Switzerland (approx. 7 years)
+    avg_rental_years = 7
+    if avg_rental_years < len(years_range):
+        avg_rental_value = investment_values[avg_rental_years]
+        avg_rental_zero = zero_growth_values[avg_rental_years]
+        avg_rental_diff = avg_rental_value - avg_rental_zero
+        
+        # Add vertical line at average rental duration
+        fig.add_shape(
+            type="line",
+            x0=avg_rental_years,
+            y0=0,
+            x1=avg_rental_years,
+            y1=avg_rental_value,
+            line=dict(color="gray", width=1, dash="dash"),
+        )
+        
+        # Add annotation for average rental duration
+        fig.add_annotation(
+            x=avg_rental_years,
+            y=avg_rental_value / 2,  # Position in the middle
+            text=get_text('avg_rental_annotation', lang, gain=avg_rental_diff),
+            showarrow=True,
+            arrowhead=1,
+            ax=50,
+            ay=0,
+            bordercolor="#c7c7c7",
+            bgcolor="white",
+            opacity=0.8
+        )
     
     # Update layout
     fig.update_layout(
-        title=f"Deposit Growth: 0% vs {return_rate}% Annual Return",
-        xaxis_title="Years",
-        yaxis_title="Value (CHF)",
-        legend_title="Scenario",
+        title=get_text('chart_plot_title', lang, rate=return_rate),
+        xaxis_title=get_text('chart_xaxis_title', lang),
+        yaxis_title=get_text('chart_yaxis_title', lang),
+        legend_title=get_text('chart_legend_title', lang),
         hovermode="x unified",
         height=500,
         # Set y-axis to start at 0
@@ -78,6 +119,23 @@ def create_growth_comparison_chart(deposit_amount, return_rate, years_range=None
             zerolinecolor='#ccc',
             zerolinewidth=1
         )
+    )
+    
+    # Get text templates for hover info
+    year_text = get_text('hover_year', lang).replace('{year}', '%{x}')
+    value_text = get_text('hover_value', lang).replace('{value}', '%{y:.2f}')
+    gain_text = get_text('hover_gain', lang).replace('{gain}', '%{customdata:.2f}')
+    
+    # Add hover template to show difference at each point
+    fig.update_traces(
+        hovertemplate=f"{year_text}<br>{value_text}<extra></extra>",
+        selector=dict(name=get_text('zero_return_name', lang))
+    )
+    
+    fig.update_traces(
+        hovertemplate=f"{year_text}<br>{value_text}<br>{gain_text}<extra></extra>",
+        customdata=difference_values,
+        selector=dict(name=get_text('selected_return_name', lang, rate=return_rate))
     )
     
     return fig 

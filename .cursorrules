@@ -48,6 +48,11 @@
 ## Internationalization & Localization
 - Prepare strings for potential localization (e.g., wrap user-facing text in a simple dictionary or use `gettext`/i18n placeholder structure).
 - Default currency is CHF; mark as `TODO:` if future multi-currency support is desired.
+- **Always implement in both German and English** with German as the default language.
+- For every new feature or UI element, add translations to the i18n dictionary for both languages.
+- Test all UI elements in both languages to ensure proper display and functionality.
+- Consider text expansion/contraction between languages when designing layouts.
+- Format numbers according to Swiss conventions (e.g., 1'000.00 CHF).
 
 ## AI/Autopilot Behavior
 - Never assume or invent financial logic—verify with reliable sources or ask the product owner.
