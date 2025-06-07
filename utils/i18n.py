@@ -196,6 +196,32 @@ TEXT = {
         '''
     },
     
+    # Risk Profiles
+    'risk_profile_label': {
+        'de': 'Risikoprofil',
+        'en': 'Risk Profile'
+    },
+    'risk_profile_help': {
+        'de': 'Wählen Sie ein Risikoprofil, das Ihrer Anlagestrategie entspricht',
+        'en': 'Choose a risk profile that matches your investment strategy'
+    },
+    'risk_profile_conservative': {
+        'de': 'Konservativ (1% Rendite)',
+        'en': 'Conservative (1% Return)'
+    },
+    'risk_profile_balanced': {
+        'de': 'Ausgewogen (3% Rendite)',
+        'en': 'Balanced (3% Return)'
+    },
+    'risk_profile_growth': {
+        'de': 'Wachstum (5% Rendite)',
+        'en': 'Growth (5% Return)'
+    },
+    'risk_profile_override_note': {
+        'de': 'Hinweis: Sie können die Rendite manuell anpassen',
+        'en': 'Note: You can manually adjust the return rate'
+    },
+    
     # Footer
     'footer_text': {
         'de': '© 2023 Kaution2Invest - Ein Tool für Schweizer Mieter zur Optimierung ihrer Mietkautionen',

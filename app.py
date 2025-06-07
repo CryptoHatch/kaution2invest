@@ -15,19 +15,81 @@ st.set_page_config(
     layout="wide"
 )
 
-# Get language from URL parameter if available
-url_lang = st.query_params.get("lang", None)
+# URL parameter handling
+def get_url_params():
+    """Get and validate URL parameters."""
+    params = st.query_params
+    
+    # Language parameter
+    lang = params.get("lang")
+    if lang not in ['de', 'en']:
+        lang = 'de'  # Default to German
+    
+    # Risk profile parameter
+    profile = params.get("profile")
+    if profile not in ['conservative', 'balanced', 'growth']:
+        profile = None
+    
+    # Return rate is determined by profile
+    return_rate = None
+    if profile == 'conservative':
+        return_rate = 1
+    elif profile == 'balanced':
+        return_rate = 3
+    elif profile == 'growth':
+        return_rate = 5
+    
+    return lang, profile, return_rate
 
-# Initialize session state for language preference if it doesn't exist
-if 'language' not in st.session_state:
-    # Set default language from URL parameter if available, otherwise default to German
-    st.session_state.language = url_lang if url_lang in ['de', 'en'] else 'de'
+# Initialize session state
+def init_session_state():
+    """Initialize or update session state from URL parameters."""
+    lang, profile, return_rate = get_url_params()
+    
+    # Initialize language
+    if 'language' not in st.session_state:
+        st.session_state.language = lang
+    
+    # Initialize risk profile
+    if 'risk_profile' not in st.session_state:
+        st.session_state.risk_profile = profile or 'balanced'  # Default to balanced
+    
+    # Initialize return rate based on profile or URL parameter
+    if 'return_rate' not in st.session_state:
+        if return_rate is not None:
+            st.session_state.return_rate = return_rate
+        elif profile == 'conservative':
+            st.session_state.return_rate = 1
+        elif profile == 'growth':
+            st.session_state.return_rate = 5
+        else:  # balanced or None
+            st.session_state.return_rate = 3
+
+# Initialize session state
+init_session_state()
 
 # Function to change language
 def change_language():
     st.session_state.language = st.session_state.lang_selection
-    # Update URL parameter when language changes
     st.query_params["lang"] = st.session_state.language
+
+# Function to change risk profile
+def change_risk_profile():
+    """Update risk profile and associated return rate."""
+    profile = st.session_state.risk_profile_selection
+    st.session_state.risk_profile = profile
+    
+    # Set return rate based on profile
+    if profile == 'conservative':
+        st.session_state.return_rate = 1
+    elif profile == 'balanced':
+        st.session_state.return_rate = 3
+    elif profile == 'growth':
+        st.session_state.return_rate = 5
+    
+    # Update URL parameters
+    st.query_params["profile"] = profile
+    st.query_params["return"] = str(st.session_state.return_rate)
 
 # Current language
 lang = st.session_state.language
@@ -52,9 +114,21 @@ st.markdown(get_text('app_description', lang))
 # User input section
 st.subheader(get_text('input_section_title', lang))
 
+# Risk profile and return rate selection
 col1, col2, col3 = st.columns(3)
 
 with col1:
+    st.selectbox(
+        get_text('risk_profile_label', lang),
+        options=['conservative', 'balanced', 'growth'],
+        format_func=lambda x: get_text(f'risk_profile_{x}', lang),
+        index=['conservative', 'balanced', 'growth'].index(st.session_state.risk_profile),
+        key='risk_profile_selection',
+        on_change=change_risk_profile,
+        help=get_text('risk_profile_help', lang)
+    )
+
+with col2:
     rent_amount = st.number_input(
         get_text('rent_amount_label', lang),
         min_value=0,
@@ -63,22 +137,13 @@ with col1:
         help=get_text('rent_amount_help', lang)
     )
 
-with col2:
+with col3:
     deposit_months = st.number_input(
         get_text('deposit_months_label', lang),
         min_value=0,
         value=3,
         step=1,
         help=get_text('deposit_months_help', lang)
-    )
-
-with col3:
-    return_rate = st.selectbox(
-        get_text('return_rate_label', lang),
-        options=[1, 3, 5],
-        index=1,  # Default to 3%
-        format_func=lambda x: f"{x}%",
-        help=get_text('return_rate_help', lang)
     )
 
 # Calculate the initial deposit amount
@@ -93,6 +158,9 @@ with st.expander(get_text('compound_interest_title', lang)):
 
 # Time horizons for calculation
 time_horizons = [1, 5, 10, 15, 20]  # years - added 20 years
+
+# Use return rate from session state (set by risk profile)
+return_rate = st.session_state.return_rate
 
 # Generate growth data
 results = generate_growth_data(deposit_amount, return_rate, time_horizons)
