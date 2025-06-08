@@ -100,7 +100,7 @@ with title_col:
     st.title(get_text('app_title', lang))
 with lang_col:
     st.selectbox(
-        "",
+        get_text('language_selector_label', lang),
         options=['de', 'en'],
         format_func=lambda x: get_text(f'language_{x}', lang),
         index=0 if lang == 'de' else 1,
@@ -145,6 +145,10 @@ with col3:
         step=1,
         help=get_text('deposit_months_help', lang)
     )
+    
+    # Display warning if deposit duration exceeds 3 months
+    if deposit_months > 3:
+        st.warning(get_text('deposit_duration_warning', lang))
 
 # Calculate the initial deposit amount
 deposit_amount = rent_amount * deposit_months
@@ -167,6 +171,9 @@ results = generate_growth_data(deposit_amount, return_rate, time_horizons)
 
 # Translate column headers for the dataframe
 results_df = pd.DataFrame(results)
+# Set the "Years" column as index and then immediately reset it to make it a regular column
+# This ensures it's treated as a data column, not an index
+results_df = results_df.set_index("Years").reset_index()
 results_df = results_df.rename(columns={
     "Years": get_text('years_column', lang),
     "0% Return (CHF)": get_text('zero_return_column', lang),
@@ -200,13 +207,6 @@ def highlight_columns(df):
     
     return styled
 
-# Display the results table with styling
-st.subheader(get_text('results_title', lang))
-st.dataframe(
-    highlight_columns(results_df),
-    use_container_width=True
-)
-
 # Create visualization
 st.subheader(get_text('chart_title', lang))
 
@@ -214,6 +214,35 @@ st.subheader(get_text('chart_title', lang))
 # Note: We'll need to update the visualization.py file later to support internationalization
 chart = create_growth_comparison_chart(deposit_amount, return_rate)
 st.plotly_chart(chart, use_container_width=True)
+
+# Display the results table with styling in a collapsible section
+with st.expander(get_text('results_title', lang), expanded=False):
+    # Create a new DataFrame that specifically doesn't use the default integer index
+    # Instead we make "Years" both a column and the index, then hide it as index in the display
+    display_df = results_df.copy()
+    display_df.set_index(get_text('years_column', lang), inplace=True)
+    
+    # Create style
+    styled_df = display_df.style.format({
+        get_text('zero_return_column', lang): "{:,.2f}",
+        get_text('selected_return_column', lang, rate=return_rate): "{:,.2f}",
+        get_text('difference_column', lang): "{:,.2f}",
+        get_text('growth_column', lang): "{:.2f}%"
+    })
+    
+    # Apply background colors
+    styled_df = styled_df.set_properties(
+        subset=[get_text('zero_return_column', lang)],
+        **{'background-color': '#ffebee', 'color': '#000000'}
+    )
+    
+    styled_df = styled_df.set_properties(
+        subset=[get_text('selected_return_column', lang, rate=return_rate)],
+        **{'background-color': '#e3f2fd', 'color': '#000000'}
+    )
+    
+    # Display the dataframe
+    st.dataframe(styled_df, use_container_width=True)
 
 # Add collapsible explanation section
 with st.expander(get_text('explanation_title', lang)):

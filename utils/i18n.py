@@ -78,8 +78,8 @@ TEXT = {
     
     # Results table
     'results_title': {
-        'de': 'Vergleich des Anlagewachstums',
-        'en': 'Investment Growth Comparison'
+        'de': 'Tabellarische Ansicht des Anlagenwachstums',
+        'en': 'Tabular View of Investment Growth'
     },
     'zero_return_column': {
         'de': '0% Rendite (CHF)',
@@ -128,8 +128,8 @@ TEXT = {
         'en': '0% Return'
     },
     'selected_return_name': {
-        'de': '{rate}% Rendite',
-        'en': '{rate}% Return'
+        'de': '{rate}% Rendite pro Jahr',
+        'en': '{rate}% Return per year'
     },
     'potential_gain_name': {
         'de': 'Potentieller Gewinn',
@@ -241,6 +241,12 @@ TEXT = {
         'de': 'Englisch',
         'en': 'English'
     }
+}
+
+# Add warning message for deposit duration
+TEXT['deposit_duration_warning'] = {
+    'de': 'Hinweis: Die übliche Kautionsdauer in der Schweiz beträgt nicht mehr als drei Monate. Bitte stellen Sie sicher, dass Sie den richtigen Wert eingegeben haben.',
+    'en': 'Note: The usual deposit duration in Switzerland is not more than three months. Please make sure you have entered the correct value.'
 }
 
 def get_text(key, lang='de', **kwargs):

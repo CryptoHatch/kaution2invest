@@ -90,7 +90,7 @@ def create_growth_comparison_chart(deposit_amount, return_rate, years_range=None
             name=get_text('potential_gain_name', lang),
             fill='tonexty',
             fillcolor=fill_color,
-            showlegend=True
+            showlegend=False
         )
     )
     
@@ -131,6 +131,13 @@ def create_growth_comparison_chart(deposit_amount, return_rate, years_range=None
         xaxis_title=get_text('chart_xaxis_title', lang),
         yaxis_title=get_text('chart_yaxis_title', lang),
         legend_title=get_text('chart_legend_title', lang),
+        legend=dict(
+            orientation="h",
+            yanchor="top",
+            y=-0.2,
+            xanchor="center",
+            x=0.5
+        ),
         hovermode="x unified",
         height=500,
         # Set y-axis to start at deposit_amount - 1000 (but never below 0)
@@ -138,8 +145,13 @@ def create_growth_comparison_chart(deposit_amount, return_rate, years_range=None
             range=[max(0, deposit_amount - 500), max(investment_values) * 1.1],
             zeroline=True,
             zerolinecolor='#ccc',
-            zerolinewidth=1
-        )
+            zerolinewidth=1,
+            fixedrange=True  # Disable y-axis zooming/panning
+        ),
+        xaxis=dict(
+            fixedrange=True  # Disable x-axis zooming/panning
+        ),
+        dragmode=False  # Disable all dragging/panning modes
     )
     
     # Get text templates for hover info
